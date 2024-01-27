@@ -600,3 +600,15 @@ table a {
 .Toastify__toast-body {
   font-size: var(--fs-300);
 }
+.flex {
+  display:flex;
+  align-items:center;
+  
+}
+.btn1 {
+  background-color: var(--backdrop);
+  border: 2px solid var(--backdrop);
+  display: flex;
+  align-items: center;
+  margin-left:10px;
+}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Form, Link } from "react-router-dom";
 import {
   calculateSpentByBudget,
@@ -6,26 +6,16 @@ import {
   formatPercentage,
 } from "../helpers";
 import { BanknotesIcon, TrashIcon } from "@heroicons/react/24/solid";
-
 const BudgetItem = ({ budget, showDelete = false }) => {
   const { id, name, amount, color } = budget;
-  const spent = calculateSpentByBudget(id);
 
   // Add state variable to track the total amount spent within the budget
-  const [totalSpent, setTotalSpent] = useState(spent);
-
+  const [totalSpent, setTotalSpent] = useState(calculateSpentByBudget(id));
+  useEffect(() => {
+    // Calculate total spent and update state
+    setTotalSpent(calculateSpentByBudget(id));
+  }, [budget]);
   // Function to handle adding a product
-  const handleAddProduct = () => {
-    // Check if the new total spent after adding the product exceeds the budgeted amount
-    if (totalSpent  > amount) {
-      // Handle the case where the budget limit is exceeded (e.g., show an error message)
-      alert("Budget limit exceeded for this budget! Cannot add more products.");
-    } else {
-      // Add product logic here (e.g., update the state, perform necessary actions)
-      // Update the total spent
-      setTotalSpent(totalSpent );
-    }
-  };
 
   return (
     <div
@@ -45,17 +35,7 @@ const BudgetItem = ({ budget, showDelete = false }) => {
         <small>{formatCurrency(totalSpent)} spent</small>
         <small>{formatCurrency(amount - totalSpent)} remaining</small>
       </div>
-      <div className="flex-sm">
-        <button
-          type="button"
-          className="btn"
-          onClick={handleAddProduct}
-          disabled={totalSpent >= amount} // Disable the button when the budget limit is reached
-        >
-          <span>Add Product</span>
-          {/* Add your product icon here */}
-        </button>
-      </div>
+
       {showDelete ? (
         <div className="flex-sm">
           <Form

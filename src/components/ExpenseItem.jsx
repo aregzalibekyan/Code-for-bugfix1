@@ -9,7 +9,7 @@ import {
 } from "../helpers";
 
 //library import
-import { TrashIcon } from "@heroicons/react/24/solid";
+import { TrashIcon, CloudIcon } from "@heroicons/react/24/solid";
 
 const ExpenseItem = ({ expense, showBudget }) => {
   const fetcher = useFetcher();
@@ -38,17 +38,32 @@ const ExpenseItem = ({ expense, showBudget }) => {
         </td>
       )}
       <td>
-        <fetcher.Form method="post">
-          <input type="hidden" name="_action" value="deleteExpense" />
-          <input type="hidden" name="expenseId" value={expense.id} />
-          <button
-            type="submit"
-            className="btn btn--warning"
-            aria-label={`Delete ${expense.name} expense`}
-          >
-            <TrashIcon width={20} />
-          </button>
-        </fetcher.Form>
+        <div className="flex">
+          <fetcher.Form method="post">
+            <input type="hidden" name="_action" value="deleteExpense" />
+            <input type="hidden" name="expenseId" value={expense.id} />
+            <button
+              type="submit"
+              className="btn btn--warning"
+              aria-label={`Delete ${expense.name} expense`}
+            >
+              <TrashIcon width={20} />
+            </button>
+          </fetcher.Form>
+
+          <fetcher.Form method="post">
+            <input type="hidden" name="_action" value="updateExpense" />
+            <input type="hidden" name="expenseId" value={expense.id} />
+            <Link
+              to={`/budget/${expense.budgetId}`}
+              type="submit"
+              className="btn--success btn1"
+              aria-label={`Update ${expense.name} expense`}
+            >
+              <CloudIcon width={20} />
+            </Link>
+          </fetcher.Form>
+        </div>
       </td>
     </>
   );

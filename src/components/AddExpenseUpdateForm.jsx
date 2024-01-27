@@ -7,7 +7,7 @@ import { useFetcher } from "react-router-dom";
 //library imports
 import { PlusCircleIcon } from "@heroicons/react/24/solid";
 
-const AddExpenseForm = ({ budgets }) => {
+const AddExpenseUpdateForm = ({ expenses }) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
   const formRef = useRef();
@@ -24,9 +24,9 @@ const AddExpenseForm = ({ budgets }) => {
   return (
     <div className="form-wrapper">
       <h2 className="h3">
-        Add New{" "}
+        Update{" "}
         <span className="accent">
-          {budgets.length === 1 && `${budgets.map((budg) => budg.name)}`}
+          {expenses && expenses.length == 1 && expenses[0].name}
         </span>{" "}
         Expense
       </h2>
@@ -46,39 +46,42 @@ const AddExpenseForm = ({ budgets }) => {
           <div className="grid-xs">
             <label htmlFor="newExpenseAmount">Amount</label>
             <input
-              type="text"
+              type="number"
               step="0.01"
               min="1"
               inputMode="decimal"
               name="newExpenseAmount"
               id="newExpenseAmount"
               placeholder="e.g., 3.50, positive val."
-              required
               max="9999999999"
+              required
             />
           </div>
         </div>
-        <div className="grid-xs" hidden={budgets.length === 1}>
+        <div
+          className="grid-xs"
+          hidden={expenses.length === 1 || expenses.length === 0}
+        >
           <label htmlFor="newExpenseBudget">Budget Category</label>
-          <select name="newExpenseBudget" id="newExpenseBudget" required>
-            {budgets
-              .sort((a, b) => a.createdAt - b.createdAt)
-              .map((expense) => {
-                return (
+          <select name="newExpenseId" id="newExpenseBudget" required>
+            {expenses &&
+              expenses.length != 0 &&
+              expenses
+                .sort((a, b) => a.createdAt - b.createdAt)
+                .map((expense) => (
                   <option key={expense.id} value={expense.id}>
                     {expense.name}
                   </option>
-                );
-              })}
+                ))}
           </select>
         </div>
-        <input type="hidden" name="_action" value="createExpense" />
+        <input type="hidden" name="_action" value="updateExpense" />
         <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
           {isSubmitting ? (
             <span>Submitting budget...</span>
           ) : (
             <>
-              <span>Add Expense</span>
+              <span>Update Expense</span>
               <PlusCircleIcon width={20} />
             </>
           )}
@@ -88,4 +91,4 @@ const AddExpenseForm = ({ budgets }) => {
   );
 };
 
-export default AddExpenseForm;
+export default AddExpenseUpdateForm;

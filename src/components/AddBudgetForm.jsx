@@ -40,13 +40,14 @@ const AddBudgetForm = () => {
           <label htmlFor="newBudgetAmount">Amount</label>
           <input
             type="number"
-            step="1"
+            step="0.01"
             min="1"
             name="newBudgetAmount"
             id="newBudgetAmount"
-            placeholder="e.g., $350"
+            placeholder="e.g., $350 , positive values only"
             required
             inputMode="decimal"
+            max="9999999999"
           />
         </div>
         <input type="hidden" name="_action" value="createBudget" />

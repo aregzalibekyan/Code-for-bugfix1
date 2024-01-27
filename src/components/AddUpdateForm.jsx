@@ -5,9 +5,9 @@ import { useEffect, useRef } from "react";
 import { useFetcher } from "react-router-dom";
 
 //library imports
-import { PlusCircleIcon } from "@heroicons/react/24/solid";
+import { CloudIcon } from "@heroicons/react/24/solid";
 
-const AddExpenseForm = ({ budgets }) => {
+const AddUpdateForm = ({ budgets }) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
   const formRef = useRef();
@@ -24,19 +24,19 @@ const AddExpenseForm = ({ budgets }) => {
   return (
     <div className="form-wrapper">
       <h2 className="h3">
-        Add New{" "}
+        Update{" "}
         <span className="accent">
           {budgets.length === 1 && `${budgets.map((budg) => budg.name)}`}
         </span>{" "}
-        Expense
+        Values
       </h2>
       <fetcher.Form method="post" className="grid-sm" ref={formRef}>
         <div className="expense-inputs">
           <div className="grid-xs">
-            <label htmlFor="newExpense">Expense Name</label>
+            <label htmlFor="newExpense">Budget Name</label>
             <input
               type="text"
-              name="newExpense"
+              name="newBudgetName"
               id="newExpense"
               placeholder="e.g., Coffee"
               ref={focusRef}
@@ -46,11 +46,11 @@ const AddExpenseForm = ({ budgets }) => {
           <div className="grid-xs">
             <label htmlFor="newExpenseAmount">Amount</label>
             <input
-              type="text"
+              type="number"
               step="0.01"
               min="1"
               inputMode="decimal"
-              name="newExpenseAmount"
+              name="newBudgetAmount"
               id="newExpenseAmount"
               placeholder="e.g., 3.50, positive val."
               required
@@ -63,23 +63,23 @@ const AddExpenseForm = ({ budgets }) => {
           <select name="newExpenseBudget" id="newExpenseBudget" required>
             {budgets
               .sort((a, b) => a.createdAt - b.createdAt)
-              .map((expense) => {
+              .map((budget) => {
                 return (
-                  <option key={expense.id} value={expense.id}>
-                    {expense.name}
+                  <option key={budget.id} value={budget.id}>
+                    {budget.name}
                   </option>
                 );
               })}
           </select>
         </div>
-        <input type="hidden" name="_action" value="createExpense" />
-        <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
+        <input type="hidden" name="_action" value="updateBudget" />
+        <button type="submit" className="btn btn--dark">
           {isSubmitting ? (
             <span>Submitting budget...</span>
           ) : (
             <>
-              <span>Add Expense</span>
-              <PlusCircleIcon width={20} />
+              <span>Update</span>
+              <CloudIcon width={20} />
             </>
           )}
         </button>
@@ -88,4 +88,4 @@ const AddExpenseForm = ({ budgets }) => {
   );
 };
 
-export default AddExpenseForm;
+export default AddUpdateForm;
