@@ -20,7 +20,7 @@ const AddExpenseForm = ({ budgets }) => {
       // reset focus
       focusRef.current.focus();
     }
-  });
+  },[isSubmitting]);
   return (
     <div className="form-wrapper">
       <h2 className="h3">
@@ -46,9 +46,9 @@ const AddExpenseForm = ({ budgets }) => {
           <div className="grid-xs">
             <label htmlFor="newExpenseAmount">Amount</label>
             <input
-              type="text"
+              type="number"
               step="0.01"
-              min="1"
+              min="0"
               inputMode="decimal"
               name="newExpenseAmount"
               id="newExpenseAmount"
@@ -75,7 +75,7 @@ const AddExpenseForm = ({ budgets }) => {
         <input type="hidden" name="_action" value="createExpense" />
         <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
           {isSubmitting ? (
-            <span>Submitting budget...</span>
+            <span>Creating expense...</span>
           ) : (
             <>
               <span>Add Expense</span>

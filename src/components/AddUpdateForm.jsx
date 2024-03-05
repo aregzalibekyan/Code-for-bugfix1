@@ -12,7 +12,6 @@ const AddUpdateForm = ({ budgets }) => {
   const isSubmitting = fetcher.state === "submitting";
   const formRef = useRef();
   const focusRef = useRef();
-
   useEffect(() => {
     if (!isSubmitting) {
       //clear form
@@ -20,7 +19,7 @@ const AddUpdateForm = ({ budgets }) => {
       // reset focus
       focusRef.current.focus();
     }
-  });
+  },[isSubmitting]);
   return (
     <div className="form-wrapper">
       <h2 className="h3">
@@ -48,7 +47,7 @@ const AddUpdateForm = ({ budgets }) => {
             <input
               type="number"
               step="0.01"
-              min="1"
+              min="0"
               inputMode="decimal"
               name="newBudgetAmount"
               id="newExpenseAmount"
@@ -73,9 +72,9 @@ const AddUpdateForm = ({ budgets }) => {
           </select>
         </div>
         <input type="hidden" name="_action" value="updateBudget" />
-        <button type="submit" className="btn btn--dark">
+        <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
           {isSubmitting ? (
-            <span>Submitting budget...</span>
+            <span>Updating budget...</span>
           ) : (
             <>
               <span>Update</span>

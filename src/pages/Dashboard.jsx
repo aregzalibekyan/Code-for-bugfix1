@@ -10,7 +10,7 @@ import {
   wait,
   check,
   updateBudget,
-
+  getLocation
 } from "../helpers";
 
 //components
@@ -40,11 +40,13 @@ export async function dashboardAction({ request }) {
 
   //new user submission
   if (_action === "newUser") {
+    getLocation()
     try {
-      if(values.userName.trim().length != 0) {
-        if (values.userName.trim().length <= 20 && values.userName.length >=3) {
-          localStorage.setItem("userName", JSON.stringify(values.userName.trim()));
-          return toast.success(`Welcome, ${values.userName}`);
+      let len = values.userName.trim();
+      if(len.length != 0) {
+        if (len.length <= 20 && len.length >=3) {
+          localStorage.setItem("userName", JSON.stringify(len));
+          return toast.success(`Welcome, ${len}`);
         }
         return toast.error("Operation failed! Max user name length is 20 and min length is 3.");
       }
@@ -64,15 +66,15 @@ export async function dashboardAction({ request }) {
       }
      catch (e) {
       throw new Error("There was a problem creating your budget.");
-      
     }
   }
 
   if (_action === "createExpense") {
     try {
+      let [expense,amount] = [values.newExpense.trim(),values.newExpenseAmount.trim()]
       if (
-        values.newExpenseAmount.trim() != "" &&
-        values.newExpense.trim() != ""
+        expense != "" &&
+        amount != ""
       ) {
         if (values.newExpenseAmount >= 0) {
           const checked = check({

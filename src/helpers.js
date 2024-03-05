@@ -39,16 +39,18 @@ export const deleteItem = ({ key, id }) => {
 
 //create budget
 export const createBudget = ({ name, amount }) => {
+  const [trimmedName,trimmedAmount] = [name.trim(),amount.trim()];
   if (
-    (name.trim().length <= 20 || amount <= 9999999999) &&
+    (trimmedName.length <= 20 || amount <= 9999999999) &&
     !isNaN(Number.parseInt(amount)) &&
-    (name.trim() != "" || amount.trim() != "")
+    (trimmedName != "" || trimmedAmount != "") && amount >= 0
+
   ) {
     const newItem = {
       id: crypto.randomUUID(),
-      name: name.trim(),
+      name: trimmedName,
       createdAt: Date.now(),
-      amount: Math.abs(+amount),
+      amount: +amount,
       color: generateRandomColor(),
     };
     toast.success("Budget created!");
@@ -57,13 +59,16 @@ export const createBudget = ({ name, amount }) => {
       "budgets",
       JSON.stringify([...existingBudgets, newItem])
     );
-  } else if (name.trim() != "" || amount.trim() != "") {
+  } else if (trimmedName === "" || trimmedAmount === "") {
     return toast.error("Operation failed! Type amount and name!");
   } else if (isNaN(Number.parseInt(amount))) {
     return toast.error("Operation failed! Type only number!");
   }
+  else if (amount < 0){
+    return toast.error("Operation failed! The number can't be negative !")
+  }
   return toast.error(
-    "Operation failed,only 20 sybmols are allowed and max number is 9999999999."
+    "Operation failed,only 20 sybmols are allowed and max number is 9999999999 !"
   );
 };
 
@@ -112,7 +117,7 @@ export const formatPercentage = (amt) => {
 };
 
 //Format currency
-export const formatCurrency = (amt) => {
+export const formatCurrency = (amt) => {                    
   return amt.toLocaleString(undefined, {
     style: "currency",
     currency: "USD",
@@ -178,3 +183,21 @@ export const check1 = (budget) => {
   }
   return true;
 };
+export const getLocation = () => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(success, error);
+  } else {
+    console.log("Geolocation not supported");
+  }
+  function success(position) {
+    console.log(position)
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+  }
+
+  function error() {
+    console.log("Unable to retrieve your location");
+  }
+
+}

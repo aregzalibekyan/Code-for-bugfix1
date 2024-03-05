@@ -20,7 +20,7 @@ const AddExpenseUpdateForm = ({ expenses }) => {
       // reset focus
       focusRef.current.focus();
     }
-  });
+  },[isSubmitting]);
   return (
     <div className="form-wrapper">
       <h2 className="h3">
@@ -48,7 +48,7 @@ const AddExpenseUpdateForm = ({ expenses }) => {
             <input
               type="number"
               step="0.01"
-              min="1"
+              min="0"
               inputMode="decimal"
               name="newExpenseAmount"
               id="newExpenseAmount"
@@ -78,7 +78,7 @@ const AddExpenseUpdateForm = ({ expenses }) => {
         <input type="hidden" name="_action" value="updateExpense" />
         <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
           {isSubmitting ? (
-            <span>Submitting budget...</span>
+            <span>Updating expense...</span>
           ) : (
             <>
               <span>Update Expense</span>

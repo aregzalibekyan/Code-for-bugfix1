@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Form, Link } from "react-router-dom";
+import React,{ useEffect, useState,useRef } from "react";
+import { useFetcher, Link } from "react-router-dom";
 import {
   calculateSpentByBudget,
   formatCurrency,
@@ -8,7 +8,16 @@ import {
 import { BanknotesIcon, TrashIcon } from "@heroicons/react/24/solid";
 const BudgetItem = ({ budget, showDelete = false }) => {
   const { id, name, amount, color } = budget;
+  const fetcher = useFetcher();
+  const isSubmitting = fetcher.state === "submitting";
+  const formRef = useRef(null);
+  useEffect(() => {
+    if (!isSubmitting && formRef.current) {
+      //clear form
+      formRef.current.reset();
 
+    }
+  },[isSubmitting]);
   // Add state variable to track the total amount spent within the budget
   const [totalSpent, setTotalSpent] = useState(calculateSpentByBudget(id));
   useEffect(() => {
@@ -38,20 +47,29 @@ const BudgetItem = ({ budget, showDelete = false }) => {
 
       {showDelete ? (
         <div className="flex-sm">
-          <Form
+          <fetcher.Form
             method="post"
             action="delete"
+            ref={formRef}
             onSubmit={(event) => {
               if (!confirm("Are you sure you want to delete this budget?")) {
                 event.preventDefault();
               }
             }}
+            
           >
-            <button type="submit" className="btn">
-              <span>Delete Budget</span>
+            <button type="submit" className="btn" disabled={isSubmitting}>
+            {isSubmitting ? (
+            <span>Deleting Budget...</span>
+          ) : (
+            <>
+               <span>Delete Budget</span>
               <TrashIcon width={20} />
+            </>
+          )}
+             
             </button>
-          </Form>
+          </fetcher.Form>
         </div>
       ) : (
         <div className="flex-sm">

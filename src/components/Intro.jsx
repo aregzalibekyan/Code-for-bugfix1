@@ -1,13 +1,24 @@
 // rrd import
-import { Form } from "react-router-dom";
-
+import { useEffect, useRef } from "react";
 //library
 import { UserPlusIcon } from "@heroicons/react/24/solid";
-
+import { useFetcher } from "react-router-dom";
 //assets
 import illustration from "../assets/illustration.jpg";
 
 const Intro = () => {
+  const fetcher = useFetcher();
+  const isSubmitting = fetcher.state === "submitting";
+  const formRef = useRef();
+
+  useEffect(() => {
+    if (!isSubmitting) {
+      // clear form
+      formRef.current.reset();
+      // reset focus
+      
+    }
+  },[isSubmitting]);
   return (
     <div className="intro">
       <div>
@@ -18,7 +29,7 @@ const Intro = () => {
           Personal budgeting is the secret of financial freedom. Start your
           journey today.
         </p>
-        <Form method="post">
+        <fetcher.Form method="post" className="grid-sm" ref={formRef}>
           <input
             type="text"
             name="userName"
@@ -33,11 +44,17 @@ const Intro = () => {
             value="newUser"
             required
           />
-          <button type="submit" className="btn btn--dark">
+          <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span>Creating account...</span>
+          ) : (
+            <>
             <span>Create Account</span>
             <UserPlusIcon width={20} />
+            </>
+          )}
           </button>
-        </Form>
+        </fetcher.Form>
       </div>
       <img src={illustration} alt="Person with money" width={600} />
     </div>

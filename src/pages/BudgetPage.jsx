@@ -50,10 +50,11 @@ export async function budgetAction({ request }) {
 
   if (_action === "createExpense") {
     try {
-      if (
-        values.newExpenseAmount.trim() != "" &&
-        values.newExpense.trim() != ""
-      ) {
+      const [amount, expense] = [
+        values.newExpenseAmount.trim(),
+        values.newExpense.trim(),
+      ];
+      if (amount != "" && expense != "") {
         if (values.newExpenseAmount >= 0) {
           const checked = check({
             amount: values.newExpenseAmount,
@@ -93,9 +94,13 @@ export async function budgetAction({ request }) {
   }
   if (_action === "updateBudget") {
     try {
+      const [budgAmount, budgName] = [
+        values.newBudgetAmount.trim(),
+        values.newBudgetName.trim(),
+      ];
       if (
-        values.newBudgetAmount.trim() != "" &&
-        values.newBudgetName.trim() != "" &&
+        budgAmount != "" &&
+        budgName != "" &&
         check1({
           name: values.newBudgetName.trim(),
           amount: values.newBudgetAmount,
@@ -108,10 +113,7 @@ export async function budgetAction({ request }) {
           budgetId: values.newExpenseBudget,
         });
         return null;
-      } else if (
-        values.newBudgetAmount.trim() == "" ||
-        values.newBudgetName.trim() == ""
-      ) {
+      } else if (budgAmount == "" || budgName == "") {
         toast.error("Operation failed! Type name and amount!");
       } else if (values.newBudgetAmount > 9999999999) {
         toast.error("Operation failed! Max number is 9999999999!");
@@ -123,9 +125,13 @@ export async function budgetAction({ request }) {
   }
   if (_action === "updateExpense") {
     try {
+      const [expense, amount] = [
+        values.newExpense.trim(),
+        values.newExpenseAmount.trim(),
+      ];
       if (
-        values.newExpenseAmount.trim() != "" &&
-        values.newExpense.trim() != "" &&
+        expense != "" &&
+        amount != "" &&
         check1({
           name: values.newExpense.trim(),
           amount: values.newExpenseAmount,
@@ -138,10 +144,7 @@ export async function budgetAction({ request }) {
           budgetId: values.newExpenseId,
         });
         return null;
-      } else if (
-        values.newExpenseAmount.trim() == "" ||
-        values.newExpense.trim() == ""
-      ) {
+      } else if (amount == "" || expense == "") {
         toast.error("Operation failed! Type name and amount!");
       } else if (values.newExpenseAmount > 9999999999) {
         toast.error("Operation failed! Max number is 9999999999!");

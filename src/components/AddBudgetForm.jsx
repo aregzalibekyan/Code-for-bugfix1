@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 
 // rrd imports
-import { Form, useFetcher } from "react-router-dom";
+import {  useFetcher } from "react-router-dom";
 
 // library imports
 import { CurrencyDollarIcon } from "@heroicons/react/24/solid";
@@ -41,7 +41,7 @@ const AddBudgetForm = () => {
           <input
             type="number"
             step="0.01"
-            min="1"
+            min="0"
             name="newBudgetAmount"
             id="newBudgetAmount"
             placeholder="e.g., $350 , positive values only"
@@ -53,7 +53,7 @@ const AddBudgetForm = () => {
         <input type="hidden" name="_action" value="createBudget" />
         <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
           {isSubmitting ? (
-            <span>Submitting budget...</span>
+            <span>Creating budget...</span>
           ) : (
             <>
               <span>Create budget</span>
