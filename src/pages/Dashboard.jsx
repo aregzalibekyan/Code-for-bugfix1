@@ -1,5 +1,6 @@
 //rrd imports
 import { Link, useLoaderData } from "react-router-dom";
+import React, { useRef } from "react";
 // helpers
 import {
   createBudget,
@@ -9,7 +10,6 @@ import {
   wait,
   check,
   updateBudget,
-  getCurrency
 } from "../helpers";
 
 //components
@@ -39,15 +39,16 @@ export async function dashboardAction({ request }) {
 
   //new user submission
   if (_action === "newUser") {
-    getCurrency();
     try {
       let len = values.userName.trim();
-      if(len.length != 0) {
-        if (len.length <= 20 && len.length >=3) {
+      if (len.length != 0) {
+        if (len.length <= 20 && len.length >= 3) {
           localStorage.setItem("userName", JSON.stringify(len));
           return toast.success(`Welcome, ${len}`);
         }
-        return toast.error("Operation failed! Max user name length is 20 and min length is 3.");
+        return toast.error(
+          "Operation failed! Max user name length is 20 and min length is 3."
+        );
       }
       return toast.error("Operation failed! Type user name!");
     } catch (e) {
@@ -57,24 +58,23 @@ export async function dashboardAction({ request }) {
 
   if (_action === "createBudget") {
     try {
-        createBudget({
-          name: values.newBudget,
-          amount: values.newBudgetAmount,
-        });
-        return null;
-      }
-     catch (e) {
+      await createBudget({
+        name: values.newBudget,
+        amount: values.newBudgetAmount,
+      });
+      return null;
+    } catch (e) {
       throw new Error("There was a problem creating your budget.");
     }
   }
 
   if (_action === "createExpense") {
     try {
-      let [expense,amount] = [values.newExpense.trim(),values.newExpenseAmount.trim()]
-      if (
-        expense != "" &&
-        amount != ""
-      ) {
+      let [expense, amount] = [
+        values.newExpense.trim(),
+        values.newExpenseAmount.trim(),
+      ];
+      if (expense != "" && amount != "") {
         if (values.newExpenseAmount >= 0) {
           const checked = check({
             amount: values.newExpenseAmount,
@@ -94,9 +94,11 @@ export async function dashboardAction({ request }) {
         return toast.error("Operation failed! Positive values only!");
       }
 
-      return toast.error("Operation failed! Don't forget to give name or amount!");
+      return toast.error(
+        "Operation failed! Don't forget to give name or amount!"
+      );
     } catch (e) {
-       console.error(e)
+      console.error(e);
       throw new Error("There was a problem creating your expense.");
     }
   }
@@ -110,10 +112,9 @@ export async function dashboardAction({ request }) {
       return toast.success("Expense deleted!");
     } catch (e) {
       throw new Error("There was a problem deleting your expense.");
-
     }
   }
-  
+
   if (_action === "updateBudget") {
     try {
       updateBudget({
@@ -130,6 +131,7 @@ export async function dashboardAction({ request }) {
 
 const Dashboard = () => {
   const { userName, budgets, expenses } = useLoaderData();
+  const bottomRef = useRef(null);
 
   return (
     <div>
@@ -144,12 +146,17 @@ const Dashboard = () => {
                 <div className="flex-lg">
                   <AddBudgetForm />
                   <AddExpenseForm budgets={budgets} />
-                  
+                  <button 
+                  className="btn btn--dark ifrm--but"
+                  onClick={() => {
+                        bottomRef.current.scrollIntoView({ behavior: "smooth" });
+                  }}>Currency converter</button>
                 </div>
                 <h2>Existing Budgets</h2>
+
                 <div className="budgets">
                   {budgets.map((budget) => (
-                    <BudgetItem key={budget.id} budget={budget} /> //pass the prop here
+                    <BudgetItem key={budget.id} budget={budget} /> // pass the prop here
                   ))}
                 </div>
                 {expenses && expenses.length > 0 && (
@@ -167,6 +174,13 @@ const Dashboard = () => {
                     )}
                   </div>
                 )}
+                <div ref={bottomRef} className="div--iframe" >
+                  <iframe
+                    src="https://www.xe.com/currencyconverter/"
+                    className="iframe"
+                    
+                  ></iframe>
+                </div>
               </div>
             ) : (
               <div className="grid-sm">

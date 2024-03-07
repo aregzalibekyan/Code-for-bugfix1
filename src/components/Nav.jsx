@@ -40,7 +40,7 @@ const Nav = ({ userName }) => {
         >
           <button type="submit" className="btn btn--warning" disabled={isSubmitting}>
             {isSubmitting ? (
-              <span>Creating account...</span>
+              <span>Deleting account...</span>
             ) : (
               <>
                 <span>Delete User</span>

@@ -52,7 +52,7 @@ const AddExpenseUpdateForm = ({ expenses }) => {
               inputMode="decimal"
               name="newExpenseAmount"
               id="newExpenseAmount"
-              placeholder="e.g., 3.50, positive val."
+              placeholder="e.g., 3.50, positive val.  "
               max="9999999999"
               required
             />
@@ -62,7 +62,7 @@ const AddExpenseUpdateForm = ({ expenses }) => {
           className="grid-xs"
           hidden={expenses.length === 1 || expenses.length === 0}
         >
-          <label htmlFor="newExpenseBudget">Budget Category</label>
+          <label htmlFor="newExpenseBudget">Choose expense...</label>
           <select name="newExpenseId" id="newExpenseBudget" required>
             {expenses &&
               expenses.length != 0 &&

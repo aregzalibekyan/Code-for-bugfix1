@@ -56,7 +56,9 @@ const AddExpenseForm = ({ budgets }) => {
               required
               max="9999999999"
             />
+            
           </div>
+          
         </div>
         <div className="grid-xs" hidden={budgets.length === 1}>
           <label htmlFor="newExpenseBudget">Budget Category</label>

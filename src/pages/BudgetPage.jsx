@@ -1,6 +1,6 @@
 //rrd imports
 import { useLoaderData } from "react-router-dom";
-
+import React, { useRef } from "react";
 //helpers
 import {
   createExpense,
@@ -159,7 +159,7 @@ export async function budgetAction({ request }) {
 
 const BudgetPage = () => {
   const { budget, expenses } = useLoaderData();
-
+  const bottomRef = useRef(null);
   return (
     <div
       className="grid-lg"
@@ -174,7 +174,15 @@ const BudgetPage = () => {
         <BudgetItem budget={budget} showDelete={true} />
         <AddExpenseForm budgets={[budget]} />
         <AddUpdateForm budgets={[budget]} />
-        <AddExpenseUpdateForm expenses={expenses} />
+        {expenses.length > 0 && <AddExpenseUpdateForm expenses={expenses} />}
+        <button
+        className="btn btn--dark ifrm--but"
+          onClick={() => {
+            bottomRef.current.scrollIntoView({ behavior: "smooth" });
+          }}
+        >
+          Currency converter
+        </button>
       </div>
       {expenses && expenses.length > 0 && (
         <div className="grid-md">
@@ -184,6 +192,12 @@ const BudgetPage = () => {
           <Table expenses={expenses} showBudget={false} />
         </div>
       )}
+      <div ref={bottomRef} className="div--iframe">
+        <iframe
+          src="https://www.xe.com/currencyconverter/"
+          className="iframe"
+        ></iframe>
+      </div>
     </div>
   );
 };

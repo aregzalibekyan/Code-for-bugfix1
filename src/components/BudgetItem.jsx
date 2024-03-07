@@ -68,9 +68,19 @@ const BudgetItem = ({ budget, showDelete = false }) => {
         </div>
       ) : (
         <div className="flex-sm">
-          <Link to={`/budget/${id}`} className="btn">
+          <Link to={`/budget/${id}`} className="btn" disabled={isSubmitting}>
+          {isSubmitting ? (
+            <span>Loading...</span>
+          ) : (
+            <>
             <span>View Details</span>
-            <BanknotesIcon width={20} />
+            
+            </>
+          )           
+          
+          }
+          <BanknotesIcon width={20} />
+           
           </Link>
         </div>
       )}

@@ -11,7 +11,7 @@ function existingBudgets1(value, id ) {
   const existingBudgets = fetchData(value) ?? [];
   for (let i = 0; i < existingBudgets.length; i++) {
     if (existingBudgets[i].id === id) {
-      return existingBudgets[i];
+      return [existingBudgets[i],i];
     }
   }
   return null;
@@ -53,7 +53,7 @@ export const createBudget = async ({ name, amount }) => {
       createdAt: Date.now(),
       amount: +amount,
       color: generateRandomColor(),
-      currency:curr ? curr : 'USD'
+      currency:curr,
     };
 
     const existingBudgets = fetchData("budgets") ?? [];
@@ -79,7 +79,7 @@ export const createBudget = async ({ name, amount }) => {
 //create expense
 export const createExpense = ({ name, amount, budgetId }) => {
   if (name.length <= 20 || amount <= 10) {
-    const curr = existingBudgets1("budgets",budgetId).currency;
+    const curr = existingBudgets1("budgets",budgetId)[0].currency;
     const newItem = {
       id: crypto.randomUUID(),
       name: name,
@@ -134,7 +134,7 @@ export const formatPercentage = (amt) => {
 //   }
 // };
 export const check = (expense) => {
-  const index = existingBudgets1("budgets", expense.budgetId);
+  const index = existingBudgets1("budgets", expense.budgetId)[0];
   if (isNaN(Number.parseInt(expense.amount))) {
     toast.error("Operation failed! You can't type text or another symbols.");
     return true;
@@ -154,27 +154,24 @@ export const updateBudget = (update) => {
       "Operation failed. If you want to decrease budget , first update or delete expense/expenses."
     );
   }
-  const index = existingBudgets1("budgets", update.budgetId);
+  const index = existingBudgets1("budgets", update.budgetId)[1];
   const existingBudgets = fetchData("budgets") ?? [];
-  index.name = update.name;
-  index.amount = +update.amount;
+  existingBudgets[index].name = update.name;
+  existingBudgets[index].amount = +update.amount;
   localStorage.setItem("budgets", JSON.stringify(existingBudgets));
   toast.success("Budget updated");
 };
 export const updateExpense = (expense) => {
-  const index = existingBudgets1("expenses", expense.budgetId);
+  const [index,currObj] = [existingBudgets1("expenses",expense.budgetId)[1],existingBudgets1("expenses", expense.budgetId)[0]];
   const existingExpenses = fetchData("expenses") ?? [];
-  const existingBudgets = fetchData("budgets") ?? [];
   if (
-    existingBudgets[
-      existingBudgets1("budgets", index.budgetId)
-    ].amount -
+    currObj.amount -
       calculateSpentByBudget(expense.budgetId) -
       expense.amount >=
     0
   ) {
-    index.name = expense.name;
-    index.amount = +expense.amount;
+    existingExpenses[index].name = expense.name;
+    existingExpenses[index].amount = +expense.amount;
     localStorage.setItem("expenses", JSON.stringify(existingExpenses));
     return toast.success("Expense updated!");
   }
@@ -196,20 +193,16 @@ export const check1 = (budget) => {
   export const getLocation = (callback) => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const latitude = position.coords.latitude;
-          const longitude = position.coords.longitude;
-          console.log(`Latitude: ${latitude}, Longitude: ${longitude}`);
+        position => {
+          const [latitude,longitude] = [position.coords.latitude,position.coords.longitude];
           callback([latitude, longitude]);
         },
-        (error) => {
-          console.log("Unable to retrieve your location");
-          callback(null);
+        error => {
+          callback(false);
         }
       );
     } else {
-      console.log("Geolocation not supported");
-      callback(null);
+      callback(false);
     }
   };
   export const getCurrency = async () => {
@@ -223,7 +216,9 @@ export const check1 = (budget) => {
       // if (!location) {
       //   throw new Error("Unable to retrieve location");
       // }
-  
+      if(!location) {
+        return '$';
+      }
       const response = await fetch(
         `http://api.geonames.org/findNearbyJSON?lat=${location[0]}&lng=${location[1]}&username=aregzalibekyan1`
       );
@@ -234,19 +229,26 @@ export const check1 = (budget) => {
       // }
         
       const countryName = som.geonames[0].countryName;
+        if(countryName) {
+          const response1 = await fetch(
+            `https://restcountries.com/v3.1/name/${countryName}?fullText=true`
+          );
+          const countryInfo = await response1.json();
+          const currency = countryInfo[0].currencies[Object.keys(countryInfo[0].currencies)[0]].symbol;
+          return currency ? currency : Object.keys(countryInfo[0].currencies)[0];
+        }
+      // const response1 = await fetch(
+      //   `https://restcountries.com/v3.1/name/${countryName}?fullText=true`
+      // );
+      // const countryInfo = await response1.json();
   
-      const response1 = await fetch(
-        `https://restcountries.com/v3.1/name/${countryName}?fullText=true`
-      );
-      const countryInfo = await response1.json();
-  
-      if (!countryInfo || countryInfo.length === 0) {
-        throw new Error("Country information not found");
-      }
-      const currency = Object.keys(countryInfo[0].currencies)[0] ? Object.keys(countryInfo[0].currencies)[0] : false;
-      return currency;
+      // if (!countryInfo || countryInfo.length === 0) {
+      //   throw new Error("Country information not found");
+      // }
+      // const currency = Object.keys(countryInfo[0].currencies)[0] 
+      // return currency ? currency : 'USD';
+     
     } catch (e) {
-      console.error("Error:", e.message);
-      return null;
+        return null;
     }
   };

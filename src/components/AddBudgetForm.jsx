@@ -1,8 +1,8 @@
 // reacts
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // rrd imports
-import {  useFetcher } from "react-router-dom";
+import { useFetcher } from "react-router-dom";
 
 // library imports
 import { CurrencyDollarIcon } from "@heroicons/react/24/solid";
@@ -10,10 +10,8 @@ import { CurrencyDollarIcon } from "@heroicons/react/24/solid";
 const AddBudgetForm = () => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
-
   const formRef = useRef();
   const focusRef = useRef();
-
   useEffect(() => {
     if (!isSubmitting) {
       formRef.current.reset();
@@ -44,7 +42,7 @@ const AddBudgetForm = () => {
             min="0"
             name="newBudgetAmount"
             id="newBudgetAmount"
-            placeholder="e.g., $350 , positive values only"
+            placeholder="e.g., 350 , positive values only"
             required
             inputMode="decimal"
             max="9999999999"
