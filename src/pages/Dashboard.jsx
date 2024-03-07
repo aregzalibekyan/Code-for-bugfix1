@@ -1,6 +1,5 @@
 //rrd imports
 import { Link, useLoaderData } from "react-router-dom";
-import { useState } from "react";
 // helpers
 import {
   createBudget,
@@ -10,7 +9,7 @@ import {
   wait,
   check,
   updateBudget,
-  getLocation
+  getCurrency
 } from "../helpers";
 
 //components
@@ -40,7 +39,7 @@ export async function dashboardAction({ request }) {
 
   //new user submission
   if (_action === "newUser") {
-    getLocation()
+    getCurrency();
     try {
       let len = values.userName.trim();
       if(len.length != 0) {
@@ -97,6 +96,7 @@ export async function dashboardAction({ request }) {
 
       return toast.error("Operation failed! Don't forget to give name or amount!");
     } catch (e) {
+       console.error(e)
       throw new Error("There was a problem creating your expense.");
     }
   }

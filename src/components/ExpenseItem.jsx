@@ -1,9 +1,9 @@
 //rrd import
 import { Link, useFetcher } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef,useState } from "react";
 // helpers
 import {
-  formatCurrency,
+  // formatCurrency,
   formatDateToLocaleString,
   getAllMatchingItems,
 } from "../helpers";
@@ -16,6 +16,7 @@ const ExpenseItem = ({ expense, showBudget }) => {
   const isSubmitting = fetcher.state === "submitting";
   const formRef = useRef();
   const formRef1 = useRef();
+  // const [formatted,setFormatted] = useState(null);
   useEffect(() => {
     if (!isSubmitting) {
       //clear form
@@ -27,11 +28,21 @@ const ExpenseItem = ({ expense, showBudget }) => {
     key: "id",
     value: expense.budgetId,
   })[0];
-
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const result = await formatCurrency(expense.amount);
+  //       setFormatted(result);
+  //     } catch (e) {
+  //       throw e;
+  //     }
+  //   };
+  //   fetchData();
+  // });
   return (
     <>
       <td>{expense.name}</td>
-      <td>{formatCurrency(expense.amount)}</td>
+      <td>{`${expense.amount} ${expense.currency}`}</td>
       <td>{formatDateToLocaleString(expense.createdAt)}</td>
       {showBudget && (
         <td>
