@@ -10,6 +10,7 @@ import {
   updateBudget,
   check1,
   updateExpense,
+  fetchData
 } from "../helpers";
 
 //components
@@ -50,33 +51,26 @@ export async function budgetAction({ request }) {
 
   if (_action === "createExpense") {
     try {
-      const [amount, expense] = [
-        values.newExpenseAmount.trim(),
-        values.newExpense.trim(),
-      ];
-      if (amount != "" && expense != "") {
-        if (values.newExpenseAmount >= 0) {
-          const checked = check({
-            amount: values.newExpenseAmount,
+     
+        const checked = check({
+          expense:values.newExpense.trim(),
+          amount: values.newExpenseAmount.trim(),
+          budgetId: values.newExpenseBudget,
+        },"expense");
+        if (!checked) {
+          createExpense({
+            name: values.newExpense.trim(),
+            amount: parseFloat(values.newExpenseAmount),
             budgetId: values.newExpenseBudget,
           });
-          if (!checked) {
-            createExpense({
-              name: values.newExpense.trim(),
-              amount: values.newExpenseAmount,
-              budgetId: values.newExpenseBudget,
-            });
-            return null;
-          }
+          // change the Value
           return null;
         }
-        return toast.error("Operation failed! Positive values only!");
-      }
+        return null;
+      
+    
 
-      return toast.error(
-        "Operation failed! Don't forget to give name or amount!"
-      );
-    } catch (e) {
+  } catch (e) {
       throw new Error("There was a problem creating your expense.");
     }
   }
@@ -102,13 +96,13 @@ export async function budgetAction({ request }) {
         budgAmount != "" &&
         budgName != "" &&
         check1({
-          name: values.newBudgetName.trim(),
+          name: budgName,
           amount: values.newBudgetAmount,
         }) &&
         values.newBudgetAmount <= 9999999999
       ) {
         updateBudget({
-          name: values.newBudgetName.trim(),
+          name: budgName,
           amount: values.newBudgetAmount,
           budgetId: values.newExpenseBudget,
         });
@@ -137,11 +131,16 @@ export async function budgetAction({ request }) {
           amount: values.newExpenseAmount,
         }) &&
         values.newExpenseAmount <= 9999999999
-      ) {
+      )
+       {
+        const expenseObj = fetchData("expenses").find(
+          (exp) => exp.id === values.newExpenseId
+        );
         updateExpense({
           name: values.newExpense,
-          amount: values.newExpenseAmount,
-          budgetId: values.newExpenseId,
+          amount: parseFloat(values.newExpenseAmount),
+          budgetId: expenseObj.budgetId,
+          expenseId: values.newExpenseId
         });
         return null;
       } else if (amount == "" || expense == "") {

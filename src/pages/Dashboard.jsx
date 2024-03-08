@@ -70,33 +70,21 @@ export async function dashboardAction({ request }) {
 
   if (_action === "createExpense") {
     try {
-      let [expense, amount] = [
-        values.newExpense.trim(),
-        values.newExpenseAmount.trim(),
-      ];
-      if (expense != "" && amount != "") {
-        if (values.newExpenseAmount >= 0) {
           const checked = check({
-            amount: values.newExpenseAmount,
+            expense:values.newExpense.trim(),
+            amount: values.newExpenseAmount.trim(),
             budgetId: values.newExpenseBudget,
-          });
+          },"expense");
           if (!checked) {
             createExpense({
               name: values.newExpense.trim(),
-              amount: values.newExpenseAmount,
+              amount: parseFloat(values.newExpenseAmount),
               budgetId: values.newExpenseBudget,
             });
             // change the Value
             return null;
           }
           return null;
-        }
-        return toast.error("Operation failed! Positive values only!");
-      }
-
-      return toast.error(
-        "Operation failed! Don't forget to give name or amount!"
-      );
     } catch (e) {
       console.error(e);
       throw new Error("There was a problem creating your expense.");
@@ -173,15 +161,11 @@ const Dashboard = () => {
                       </Link>
                     )}
                   </div>
+                  
                 )}
-                <div ref={bottomRef} className="div--iframe" >
-                  <iframe
-                    src="https://www.xe.com/currencyconverter/"
-                    className="iframe"
-                    
-                  ></iframe>
-                </div>
+                
               </div>
+              
             ) : (
               <div className="grid-sm">
                 <p>Personal Budgeting is the secret to financial freedom.</p>
@@ -189,6 +173,13 @@ const Dashboard = () => {
                 <AddBudgetForm />
               </div>
             )}
+            <div ref={bottomRef} className="div--iframe" >
+                  <iframe
+                    src="https://www.xe.com/currencyconverter/"
+                    className="iframe"
+                    
+                  ></iframe>
+                </div>
           </div>
         </div>
       ) : (

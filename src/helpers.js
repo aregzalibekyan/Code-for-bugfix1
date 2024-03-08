@@ -7,11 +7,11 @@ const generateRandomColor = () => {
   const existingBudgetLength = fetchData("budgets")?.length ?? 0;
   return `${existingBudgetLength * 34} 65% 50%`;
 };
-function existingBudgets1(value, id ) {
+function existingBudgets1(value, id) {
   const existingBudgets = fetchData(value) ?? [];
   for (let i = 0; i < existingBudgets.length; i++) {
     if (existingBudgets[i].id === id) {
-      return [existingBudgets[i],i];
+      return [existingBudgets[i], i];
     }
   }
   return null;
@@ -37,14 +37,38 @@ export const deleteItem = ({ key, id }) => {
   return localStorage.removeItem(key);
 };
 
+export const checkIfExisting = (
+  category,
+  name,
+  except = false,
+  budgetId = false
+) => {
+  const budgets = fetchData(category) ?? [];
+  const elem1 = budgets.some((elem) => {
+    return (
+      elem.name === name &&
+      category === "budgets" ? (budgetId ? elem.budgetId === budgetId : true) : (budgetId ? elem.expenseId === budgetId : true) &&
+      (except ? elem.budgetId != elem.budgetId : true)
+    );
+  });
+  return elem1;
+};
 //create budget
 export const createBudget = async ({ name, amount }) => {
-  const [trimmedName, trimmedAmount] = [name.trim(), amount.trim()];
+  const [trimmedName, trimmedAmount, checkIf] = [
+    name.trim(),
+    amount.trim(),
+    checkIfExisting("budgets", name),
+  ];
   if (
-    (trimmedName.length <= 20 || amount <= 9999999999) &&
-    !isNaN(Number.parseInt(amount)) &&
-    (trimmedName != "" || trimmedAmount != "") &&
-    amount >= 0
+    !check(
+      {
+        expense: trimmedName,
+        amount: trimmedAmount,
+      },
+      "budgets"
+    ) &&
+    !checkIf
   ) {
     let curr = await getCurrency();
     const newItem = {
@@ -53,40 +77,34 @@ export const createBudget = async ({ name, amount }) => {
       createdAt: Date.now(),
       amount: +amount,
       color: generateRandomColor(),
-      currency:curr,
+      currency: curr,
     };
 
     const existingBudgets = fetchData("budgets") ?? [];
-    toast.success('Budget created!')
+    toast.success("Budget created!");
     return localStorage.setItem(
       "budgets",
       JSON.stringify([...existingBudgets, newItem])
     );
-    
-    
-  } else if (trimmedName === "" || trimmedAmount === "") {
-    return toast.error("Operation failed! Type amount and name!");
-  } else if (isNaN(Number.parseInt(amount))) {
-    return toast.error("Operation failed! Type only number!");
-  } else if (amount < 0) {
-    return toast.error("Operation failed! The number can't be negative !");
+  } else if (checkIf) {
+    return toast.error(
+      "The budget can't have same budget name as other budget have!"
+    );
   }
-  return toast.error(
-    "Operation failed,only 20 sybmols are allowed and max number is 9999999999 !"
-  );
 };
 
 //create expense
 export const createExpense = ({ name, amount, budgetId }) => {
-  if (name.length <= 20 || amount <= 10) {
-    const curr = existingBudgets1("budgets",budgetId)[0].currency;
+  const checkIf = checkIfExisting("expenses", name, false, budgetId);
+  if (!checkIf) {
+    const curr = existingBudgets1("budgets", budgetId)[0].currency;
     const newItem = {
       id: crypto.randomUUID(),
       name: name,
       createdAt: Date.now(),
       amount: +amount,
       budgetId: budgetId,
-      currency:curr,
+      currency: curr,
     };
     toast.success("Expense created!");
     const existingExpenses = fetchData("expenses") ?? [];
@@ -94,18 +112,23 @@ export const createExpense = ({ name, amount, budgetId }) => {
       "expenses",
       JSON.stringify([...existingExpenses, newItem])
     );
+  } else if (checkIf) {
+    return toast.error(
+      "Operation failed! The expense can't have same expense name as other expense have!"
+    );
   }
-  return toast.error("Operation failed,only 20 sybmols are allowed.");
 };
 
 // total spend by budget
 export const calculateSpentByBudget = (budgetId) => {
   const expenses = fetchData("expenses") ?? [];
   const budgetSpent = expenses.reduce((acc, expense) => {
-    // check if expense.id === budgetId
-    if (expense.budgetId !== budgetId) return acc;
-    // add the current amount to my total
-    return (acc += expense.amount);
+    // check if expense.budgetId === budgetId
+    if (expense.budgetId === budgetId) {
+      // add the current amount to my total
+      acc += expense.amount;
+    }
+    return acc;
   }, 0);
   return budgetSpent;
 };
@@ -133,26 +156,53 @@ export const formatPercentage = (amt) => {
 //     throw e;
 //   }
 // };
-export const check = (expense) => {
-  const index = existingBudgets1("budgets", expense.budgetId)[0];
+export const check = (expense, category) => {
+  if (category == "expense") {
+    const index = existingBudgets1("budgets", expense.budgetId)[0];
+    if (
+      index.amount - calculateSpentByBudget(expense.budgetId) - expense.amount <
+      0
+    ) {
+      toast.error("Operation failed! The expense can't be over the budget.");
+      return true;
+    }
+  }
   if (isNaN(Number.parseInt(expense.amount))) {
     toast.error("Operation failed! You can't type text or another symbols.");
     return true;
   }
-  if (
-    index.amount - calculateSpentByBudget(expense.budgetId) - expense.amount <
-    0
-  ) {
-    toast.error("Operation failed! The expense can't be over the budget.");
+  if (expense.expense === "" || expense.amount === "") {
+    toast.error("Operation failed! Don't forget to give name or amount!");
+    return true;
+  }
+  if (Number.parseFloat(expense.amount) < 0) {
+    toast.error("Operation failed! Positive values only!");
+    return true;
+  }
+  if (expense.expense.length > 20 || parseFloat(expense.amount) > 999999999) {
+    toast.error(
+      "Operation failed,only 20 sybmols are allowed and max number is 9999999999 !"
+    );
     return true;
   }
   return false;
 };
 export const updateBudget = (update) => {
+  const checkIfExisting1 = checkIfExisting(
+    "budgets",
+    update.name,
+    update.budgetId
+  );
   if (update.amount - calculateSpentByBudget(update.budgetId) < 0) {
     return toast.error(
       "Operation failed. If you want to decrease budget , first update or delete expense/expenses."
     );
+  } else if (checkIfExisting1) {
+    return toast.error(
+      "Operation failed! The new budget name can't have same name as other budgets have!"
+    );
+  } else if (update.name.length > 20 || update.amount > 999999999) {
+    return toast.error("Operation failed,only 20 sybmols are allowed and max number is 9999999999 !");
   }
   const index = existingBudgets1("budgets", update.budgetId)[1];
   const existingBudgets = fetchData("budgets") ?? [];
@@ -161,94 +211,93 @@ export const updateBudget = (update) => {
   localStorage.setItem("budgets", JSON.stringify(existingBudgets));
   toast.success("Budget updated");
 };
+
 export const updateExpense = (expense) => {
-  const [index,currObj] = [existingBudgets1("expenses",expense.budgetId)[1],existingBudgets1("expenses", expense.budgetId)[0]];
-  const existingExpenses = fetchData("expenses") ?? [];
+  const [currObj, index] = existingBudgets1("expenses", expense.expenseId);
+  const checkIfExisting1 = checkIfExisting(
+    "expenses",
+    expense.name,
+    expense.expenseId,
+    expense.budgetId
+  );
+  const checked = check({
+    expense:expense.name.trim(),
+    amount:expense.amount
+  },'updateExpense');
+  const existingBudget = existingBudgets1("budgets", expense.budgetId)[0];
+  const existingExpenses = fetchData("expenses" ?? []);
   if (
-    currObj.amount -
-      calculateSpentByBudget(expense.budgetId) -
+    (existingBudget.amount -
+      calculateSpentByBudget(expense.budgetId) +
+      currObj.amount -
       expense.amount >=
-    0
+    0) && !checked
   ) {
     existingExpenses[index].name = expense.name;
-    existingExpenses[index].amount = +expense.amount;
+    existingExpenses[index].amount = parseFloat(+expense.amount);
     localStorage.setItem("expenses", JSON.stringify(existingExpenses));
     return toast.success("Expense updated!");
   }
-  return toast.error(
-    "Operation failed! Expense amount can't be more from remaining of the budget,first decrease other expenses or update budget values!"
-  );
-  // }
+  else if(checked) {
+    return null;
+  }
+  return toast.error("Operation failed! Expense amount can't be more from remaining of the budget,first decrease other expenses or update budget values!");
 };
 export const check1 = (budget) => {
   if (isNaN(Number.parseInt(budget.amount))) {
     toast.error("Operation failed! You can't type text or another symbols.");
     return false;
   } else if (budget.amount < 0) {
-    toast.error("Operation failed! Only positive numbers.");
+    toast.error("Operation failed! Only positive numbers!");
     return false;
   }
   return true;
 };
-  export const getLocation = (callback) => {
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        position => {
-          const [latitude,longitude] = [position.coords.latitude,position.coords.longitude];
-          callback([latitude, longitude]);
-        },
-        error => {
-          callback(false);
-        }
-      );
-    } else {
-      callback(false);
-    }
-  };
-  export const getCurrency = async () => {
-    try {
-      const location = await new Promise((resolve) => {
-        getLocation((locationData) => {
-          resolve(locationData);
-        });
-      });
-  
-      // if (!location) {
-      //   throw new Error("Unable to retrieve location");
-      // }
-      if(!location) {
-        return '$';
+export const getLocation = (callback) => {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const [latitude, longitude] = [
+          position.coords.latitude,
+          position.coords.longitude,
+        ];
+        callback([latitude, longitude]);
+      },
+      (error) => {
+        callback(false);
       }
-      const response = await fetch(
-        `http://api.geonames.org/findNearbyJSON?lat=${location[0]}&lng=${location[1]}&username=aregzalibekyan1`
-      );
-      const som = await response.json();
-  
-      // if (!som.geonames || som.geonames.length === 0) {
-      //   throw new Error("No nearby locations found");
-      // }
-        
-      const countryName = som.geonames[0].countryName;
-        if(countryName) {
-          const response1 = await fetch(
-            `https://restcountries.com/v3.1/name/${countryName}?fullText=true`
-          );
-          const countryInfo = await response1.json();
-          const currency = countryInfo[0].currencies[Object.keys(countryInfo[0].currencies)[0]].symbol;
-          return currency ? currency : Object.keys(countryInfo[0].currencies)[0];
-        }
-      // const response1 = await fetch(
-      //   `https://restcountries.com/v3.1/name/${countryName}?fullText=true`
-      // );
-      // const countryInfo = await response1.json();
-  
-      // if (!countryInfo || countryInfo.length === 0) {
-      //   throw new Error("Country information not found");
-      // }
-      // const currency = Object.keys(countryInfo[0].currencies)[0] 
-      // return currency ? currency : 'USD';
-     
-    } catch (e) {
-        return null;
+    );
+  } else {
+    callback(false);
+  }
+};
+export const getCurrency = async () => {
+  try {
+    const location = await new Promise((resolve) => {
+      getLocation((locationData) => {
+        resolve(locationData);
+      });
+    });
+
+    if (!location) {
+      return "$";
     }
-  };
+    const response = await fetch(
+      `http://api.geonames.org/findNearbyJSON?lat=${location[0]}&lng=${location[1]}&username=aregzalibekyan1`
+    );
+    const som = await response.json();
+    const countryName = som.geonames[0].countryName;
+    if (countryName) {
+      const response1 = await fetch(
+        `https://restcountries.com/v3.1/name/${countryName}?fullText=true`
+      );
+      const countryInfo = await response1.json();
+      const currency =
+        countryInfo[0].currencies[Object.keys(countryInfo[0].currencies)[0]]
+          .symbol;
+      return currency ?? Object.keys(countryInfo[0].currencies)[0];
+    }
+  } catch (e) {
+    return null;
+  }
+};
