@@ -46,9 +46,9 @@ export const checkIfExisting = (
   const budgets = fetchData(category) ?? [];
   const elem1 = budgets.some((elem) => {
     return (
-      elem.name === name &&
-      category === "budgets" ? (budgetId ? elem.budgetId === budgetId : true) : (budgetId ? elem.expenseId === budgetId : true) &&
-      (except ? elem.budgetId != elem.budgetId : true)
+     elem.name === name &&
+      (budgetId ? elem.budgetId === budgetId : true) &&
+      (except ? (category === "expenses" ? elem.id != except : elem.id != except) : true)
     );
   });
   return elem1;
@@ -60,13 +60,21 @@ export const createBudget = async ({ name, amount }) => {
     amount.trim(),
     checkIfExisting("budgets", name),
   ];
+  console.log( !check(
+    {
+      expense: trimmedName,
+      amount: trimmedAmount,
+    },
+    false
+  ) &&
+  !checkIf)
   if (
     !check(
       {
         expense: trimmedName,
         amount: trimmedAmount,
       },
-      "budgets"
+      false
     ) &&
     !checkIf
   ) {
@@ -96,6 +104,7 @@ export const createBudget = async ({ name, amount }) => {
 //create expense
 export const createExpense = ({ name, amount, budgetId }) => {
   const checkIf = checkIfExisting("expenses", name, false, budgetId);
+  
   if (!checkIf) {
     const curr = existingBudgets1("budgets", budgetId)[0].currency;
     const newItem = {
@@ -157,7 +166,7 @@ export const formatPercentage = (amt) => {
 //   }
 // };
 export const check = (expense, category) => {
-  if (category == "expense") {
+  if (category) {
     const index = existingBudgets1("budgets", expense.budgetId)[0];
     if (
       index.amount - calculateSpentByBudget(expense.budgetId) - expense.amount <
@@ -191,18 +200,20 @@ export const updateBudget = (update) => {
   const checkIfExisting1 = checkIfExisting(
     "budgets",
     update.name,
-    update.budgetId
+    update.budgetId,
   );
+  const checked = check({
+    expense:update.name.trim(),
+    amount:update.amount.trim()
+  },false)
   if (update.amount - calculateSpentByBudget(update.budgetId) < 0) {
     return toast.error(
-      "Operation failed. If you want to decrease budget , first update or delete expense/expenses."
+      "Operation failed! If you want to decrease budget , first update or delete expense/expenses!"
     );
-  } else if (checkIfExisting1) {
-    return toast.error(
-      "Operation failed! The new budget name can't have same name as other budgets have!"
-    );
-  } else if (update.name.length > 20 || update.amount > 999999999) {
-    return toast.error("Operation failed,only 20 sybmols are allowed and max number is 9999999999 !");
+  } else if (checked) {
+    return null;
+  }  else if(checkIfExisting1) {
+    return toast.error("Operation failed! The budget can't have same budget name as other budgets have!")
   }
   const index = existingBudgets1("budgets", update.budgetId)[1];
   const existingBudgets = fetchData("budgets") ?? [];
@@ -217,13 +228,12 @@ export const updateExpense = (expense) => {
   const checkIfExisting1 = checkIfExisting(
     "expenses",
     expense.name,
-    expense.expenseId,
-    expense.budgetId
+    expense.expenseId
   );
   const checked = check({
     expense:expense.name.trim(),
     amount:expense.amount
-  },'updateExpense');
+  },false);
   const existingBudget = existingBudgets1("budgets", expense.budgetId)[0];
   const existingExpenses = fetchData("expenses" ?? []);
   if (
@@ -231,7 +241,7 @@ export const updateExpense = (expense) => {
       calculateSpentByBudget(expense.budgetId) +
       currObj.amount -
       expense.amount >=
-    0) && !checked
+    0) && !checked && !checkIfExisting1
   ) {
     existingExpenses[index].name = expense.name;
     existingExpenses[index].amount = parseFloat(+expense.amount);
@@ -240,19 +250,12 @@ export const updateExpense = (expense) => {
   }
   else if(checked) {
     return null;
+  } else if (checkIfExisting1) {
+    return toast.error("Operation failed! The expense can't have same expense name as other expense have!")
   }
   return toast.error("Operation failed! Expense amount can't be more from remaining of the budget,first decrease other expenses or update budget values!");
 };
-export const check1 = (budget) => {
-  if (isNaN(Number.parseInt(budget.amount))) {
-    toast.error("Operation failed! You can't type text or another symbols.");
-    return false;
-  } else if (budget.amount < 0) {
-    toast.error("Operation failed! Only positive numbers!");
-    return false;
-  }
-  return true;
-};
+
 export const getLocation = (callback) => {
   if (navigator.geolocation) {
     navigator.geolocation.getCurrentPosition(

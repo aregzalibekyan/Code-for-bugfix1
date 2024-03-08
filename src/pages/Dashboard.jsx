@@ -64,6 +64,7 @@ export async function dashboardAction({ request }) {
       });
       return null;
     } catch (e) {
+      console.error(e)
       throw new Error("There was a problem creating your budget.");
     }
   }

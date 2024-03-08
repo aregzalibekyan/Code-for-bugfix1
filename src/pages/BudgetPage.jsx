@@ -88,54 +88,20 @@ export async function budgetAction({ request }) {
   }
   if (_action === "updateBudget") {
     try {
-      const [budgAmount, budgName] = [
-        values.newBudgetAmount.trim(),
-        values.newBudgetName.trim(),
-      ];
-      if (
-        budgAmount != "" &&
-        budgName != "" &&
-        check1({
-          name: budgName,
-          amount: values.newBudgetAmount,
-        }) &&
-        values.newBudgetAmount <= 9999999999
-      ) {
         updateBudget({
           name: budgName,
           amount: values.newBudgetAmount,
           budgetId: values.newExpenseBudget,
         });
         return null;
-      } else if (budgAmount == "" || budgName == "") {
-        toast.error("Operation failed! Type name and amount!");
-      } else if (values.newBudgetAmount > 9999999999) {
-        toast.error("Operation failed! Max number is 9999999999!");
-      }
-      return null;
+      
     } catch (e) {
       return null;
     }
   }
   if (_action === "updateExpense") {
     try {
-      const [expense, amount] = [
-        values.newExpense.trim(),
-        values.newExpenseAmount.trim(),
-      ];
-      if (
-        expense != "" &&
-        amount != "" &&
-        check1({
-          name: values.newExpense.trim(),
-          amount: values.newExpenseAmount,
-        }) &&
-        values.newExpenseAmount <= 9999999999
-      )
-       {
-        const expenseObj = fetchData("expenses").find(
-          (exp) => exp.id === values.newExpenseId
-        );
+      
         updateExpense({
           name: values.newExpense,
           amount: parseFloat(values.newExpenseAmount),
@@ -143,12 +109,7 @@ export async function budgetAction({ request }) {
           expenseId: values.newExpenseId
         });
         return null;
-      } else if (amount == "" || expense == "") {
-        toast.error("Operation failed! Type name and amount!");
-      } else if (values.newExpenseAmount > 9999999999) {
-        toast.error("Operation failed! Max number is 9999999999!");
-      }
-      return null;
+    
     } catch (e) {
       console.error(e);
       throw new Error("Oh no! Something is wrong!");
@@ -192,10 +153,10 @@ const BudgetPage = () => {
         </div>
       )}
       <div ref={bottomRef} className="div--iframe">
-        <iframe
+        {/* <iframe
           src="https://www.xe.com/currencyconverter/"
           className="iframe"
-        ></iframe>
+        ></iframe> */}
       </div>
     </div>
   );
