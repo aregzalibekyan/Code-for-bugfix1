@@ -120,7 +120,7 @@ export const createExpense = ({ name, amount, budgetId }) => {
     return toast.error(
       "Operation failed! The expense can't have same expense name as other expense have!"
     );
-  }
+  };
 };
 
 // total spend by budget
@@ -131,7 +131,7 @@ export const calculateSpentByBudget = (budgetId) => {
     if (expense.budgetId === budgetId) {
       // add the current amount to my total
       acc += expense.amount;
-    }
+    };
     return acc;
   }, 0);
   return budgetSpent;
@@ -160,7 +160,7 @@ export const formatPercentage = (amt) => {
 //     throw e;
 //   }
 // };
-export const check = (expense, category) => {
+export const check = (expense, category = false) => {
   if (category) {
     const index = existingBudgets1("budgets", expense.budgetId)[0];
     if (
@@ -169,26 +169,26 @@ export const check = (expense, category) => {
     ) {
       toast.error("Operation failed! The expense can't be over the budget.");
       return true;
-    }
-  }
+    };
+  };
   if (isNaN(Number.parseInt(expense.amount))) {
     toast.error("Operation failed! You can't type text or another symbols.");
     return true;
-  }
+  };
   if (expense.expense === "" || expense.amount === "") {
     toast.error("Operation failed! Don't forget to give name or amount!");
     return true;
-  }
+  };
   if (Number.parseFloat(expense.amount) < 0) {
     toast.error("Operation failed! Positive values only!");
     return true;
-  }
+  };
   if (expense.expense.length > 20 || parseFloat(expense.amount) > 999999999) {
     toast.error(
       "Operation failed,only 20 sybmols are allowed and max number is 9999999999 !"
     );
     return true;
-  }
+  };
   return false;
 };
 export const updateBudget = (update) => {
@@ -201,8 +201,7 @@ export const updateBudget = (update) => {
     {
       expense: update.name.trim(),
       amount: update.amount.trim(),
-    },
-    false
+    }
   );
   if (update.amount - calculateSpentByBudget(update.budgetId) < 0) {
     return toast.error(
@@ -235,8 +234,7 @@ export const updateExpense = (expense) => {
     {
       expense: expense.name.trim(),
       amount: expense.amount,
-    },
-    false
+    }
   );
   const existingBudget = existingBudgets1("budgets", currObj.budgetId)[0];
   const existingExpenses = fetchData("expenses" ?? []);

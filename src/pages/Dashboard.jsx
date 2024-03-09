@@ -76,7 +76,7 @@ export async function dashboardAction({ request }) {
             expense:values.newExpense.trim(),
             amount: values.newExpenseAmount.trim(),
             budgetId: values.newExpenseBudget,
-          },"expense");
+          },true);
           if (!checked) {
             createExpense({
               name: values.newExpense.trim(),
