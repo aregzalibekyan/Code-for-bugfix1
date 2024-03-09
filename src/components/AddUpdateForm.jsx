@@ -11,13 +11,10 @@ const AddUpdateForm = ({ budgets }) => {
   const fetcher = useFetcher();
   const isSubmitting = fetcher.state === "submitting";
   const formRef = useRef();
-  const focusRef = useRef();
   useEffect(() => {
     if (!isSubmitting) {
       //clear form
       formRef.current.reset();
-      // reset focus
-      focusRef.current.focus();
     }
   },[isSubmitting]);
   return (
@@ -38,7 +35,6 @@ const AddUpdateForm = ({ budgets }) => {
               name="newBudgetName"
               id="newExpense"
               placeholder="e.g., Coffee"
-              ref={focusRef}
               required
             />
           </div>

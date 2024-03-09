@@ -8,9 +8,7 @@ import {
   getAllMatchingItems,
   check,
   updateBudget,
-  check1,
   updateExpense,
-  fetchData
 } from "../helpers";
 
 //components
@@ -89,29 +87,26 @@ export async function budgetAction({ request }) {
   if (_action === "updateBudget") {
     try {
         updateBudget({
-          name: budgName,
+          name: values.newBudgetName,
           amount: values.newBudgetAmount,
           budgetId: values.newExpenseBudget,
         });
         return null;
       
     } catch (e) {
-      return null;
+      throw new Error("Oh no! Something is wrong!");
     }
   }
   if (_action === "updateExpense") {
     try {
-      
         updateExpense({
           name: values.newExpense,
           amount: parseFloat(values.newExpenseAmount),
-          budgetId: expenseObj.budgetId,
-          expenseId: values.newExpenseId
+          expenseId: values.newExpenseId,
         });
         return null;
     
     } catch (e) {
-      console.error(e);
       throw new Error("Oh no! Something is wrong!");
     }
   }
@@ -153,10 +148,10 @@ const BudgetPage = () => {
         </div>
       )}
       <div ref={bottomRef} className="div--iframe">
-        {/* <iframe
+        <iframe
           src="https://www.xe.com/currencyconverter/"
           className="iframe"
-        ></iframe> */}
+        ></iframe>
       </div>
     </div>
   );

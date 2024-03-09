@@ -32,14 +32,14 @@ const BudgetItem = ({ budget, showDelete = false }) => {
     >
       <div className="progress-text">
         <h3>{name}</h3>
-        <p>{`${amount} ${currency}`} budgeted</p>
+        <p>{amount} {currency} budgeted</p>
       </div>
       <progress max={amount} value={totalSpent}>
         {formatPercentage(totalSpent / amount)}
       </progress>
       <div className="progress-text">
-        <small>{`${totalSpent} ${currency}`} spent</small>
-        <small>{`${amount - totalSpent} ${currency}`} remaining</small>
+        <small>{totalSpent} {currency} spent</small>
+        <small>{amount - totalSpent} {currency} remaining</small>
       </div>
 
       {showDelete ? (

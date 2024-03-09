@@ -45,7 +45,7 @@ const AddBudgetForm = () => {
             placeholder="e.g., 350 , positive values only"
             required
             inputMode="decimal"
-            max="9999999999"
+            max="999999999"
           />
         </div>
         <input type="hidden" name="_action" value="createBudget" />

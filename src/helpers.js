@@ -46,9 +46,13 @@ export const checkIfExisting = (
   const budgets = fetchData(category) ?? [];
   const elem1 = budgets.some((elem) => {
     return (
-     elem.name === name &&
+      elem.name === name &&
       (budgetId ? elem.budgetId === budgetId : true) &&
-      (except ? (category === "expenses" ? elem.id != except : elem.id != except) : true)
+      (except
+        ? category === "expenses"
+          ? elem.id != except
+          : elem.id != except
+        : true)
     );
   });
   return elem1;
@@ -60,14 +64,6 @@ export const createBudget = async ({ name, amount }) => {
     amount.trim(),
     checkIfExisting("budgets", name),
   ];
-  console.log( !check(
-    {
-      expense: trimmedName,
-      amount: trimmedAmount,
-    },
-    false
-  ) &&
-  !checkIf)
   if (
     !check(
       {
@@ -87,7 +83,6 @@ export const createBudget = async ({ name, amount }) => {
       color: generateRandomColor(),
       currency: curr,
     };
-
     const existingBudgets = fetchData("budgets") ?? [];
     toast.success("Budget created!");
     return localStorage.setItem(
@@ -104,7 +99,7 @@ export const createBudget = async ({ name, amount }) => {
 //create expense
 export const createExpense = ({ name, amount, budgetId }) => {
   const checkIf = checkIfExisting("expenses", name, false, budgetId);
-  
+
   if (!checkIf) {
     const curr = existingBudgets1("budgets", budgetId)[0].currency;
     const newItem = {
@@ -200,20 +195,25 @@ export const updateBudget = (update) => {
   const checkIfExisting1 = checkIfExisting(
     "budgets",
     update.name,
-    update.budgetId,
+    update.budgetId
   );
-  const checked = check({
-    expense:update.name.trim(),
-    amount:update.amount.trim()
-  },false)
+  const checked = check(
+    {
+      expense: update.name.trim(),
+      amount: update.amount.trim(),
+    },
+    false
+  );
   if (update.amount - calculateSpentByBudget(update.budgetId) < 0) {
     return toast.error(
       "Operation failed! If you want to decrease budget , first update or delete expense/expenses!"
     );
   } else if (checked) {
     return null;
-  }  else if(checkIfExisting1) {
-    return toast.error("Operation failed! The budget can't have same budget name as other budgets have!")
+  } else if (checkIfExisting1) {
+    return toast.error(
+      "Operation failed! The budget can't have same budget name as other budgets have!"
+    );
   }
   const index = existingBudgets1("budgets", update.budgetId)[1];
   const existingBudgets = fetchData("budgets") ?? [];
@@ -228,32 +228,41 @@ export const updateExpense = (expense) => {
   const checkIfExisting1 = checkIfExisting(
     "expenses",
     expense.name,
-    expense.expenseId
+    expense.expenseId,
+    currObj.budgetId
   );
-  const checked = check({
-    expense:expense.name.trim(),
-    amount:expense.amount
-  },false);
-  const existingBudget = existingBudgets1("budgets", expense.budgetId)[0];
+  const checked = check(
+    {
+      expense: expense.name.trim(),
+      amount: expense.amount,
+    },
+    false
+  );
+  const existingBudget = existingBudgets1("budgets", currObj.budgetId)[0];
   const existingExpenses = fetchData("expenses" ?? []);
   if (
-    (existingBudget.amount -
-      calculateSpentByBudget(expense.budgetId) +
+    existingBudget.amount -
+      calculateSpentByBudget(currObj.budgetId) +
       currObj.amount -
       expense.amount >=
-    0) && !checked && !checkIfExisting1
+      0 &&
+    !checked &&
+    !checkIfExisting1
   ) {
     existingExpenses[index].name = expense.name;
     existingExpenses[index].amount = parseFloat(+expense.amount);
     localStorage.setItem("expenses", JSON.stringify(existingExpenses));
     return toast.success("Expense updated!");
-  }
-  else if(checked) {
-    return null;
+  } else if (checked) {
+    return null;  
   } else if (checkIfExisting1) {
-    return toast.error("Operation failed! The expense can't have same expense name as other expense have!")
+    return toast.error(
+      "Operation failed! The expense can't have same expense name as other expense have!"
+    );
   }
-  return toast.error("Operation failed! Expense amount can't be more from remaining of the budget,first decrease other expenses or update budget values!");
+  return toast.error(
+    "Operation failed! Expense amount can't be more from remaining of the budget,first decrease other expenses or update budget values!"
+  );
 };
 
 export const getLocation = (callback) => {
