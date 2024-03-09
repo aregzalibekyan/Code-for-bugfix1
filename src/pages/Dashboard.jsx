@@ -58,6 +58,7 @@ export async function dashboardAction({ request }) {
 
   if (_action === "createBudget") {
     try {
+      toast.warning('Please wait some time...')
       await createBudget({
         name: values.newBudget,
         amount: values.newBudgetAmount,
