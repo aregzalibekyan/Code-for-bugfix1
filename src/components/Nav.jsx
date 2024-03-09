@@ -1,6 +1,6 @@
 //rrd import
 
-import React,{ useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { NavLink, useFetcher } from "react-router-dom";
 //assets
 import logomark from "../assets/logomark.svg";
@@ -17,9 +17,8 @@ const Nav = ({ userName }) => {
       // clear form
       formRef.current.reset();
       // reset focus
-   
     }
-  },[isSubmitting]);
+  }, [isSubmitting]);
   return (
     <nav>
       <NavLink to="/" aria-label="Go to home">
@@ -36,15 +35,18 @@ const Nav = ({ userName }) => {
               event.preventDefault();
             }
           }}
-          
         >
-          <button type="submit" className="btn btn--warning" disabled={isSubmitting}>
+          <button
+            type="submit"
+            className="btn btn--warning"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <span>Deleting account...</span>
             ) : (
               <>
                 <span>Delete User</span>
-                <TrashIcon width={20} />  
+                <TrashIcon width={20} />
               </>
             )}
           </button>

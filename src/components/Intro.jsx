@@ -16,9 +16,8 @@ const Intro = () => {
       // clear form
       formRef.current.reset();
       // reset focus
-      
     }
-  },[isSubmitting]);
+  }, [isSubmitting]);
   return (
     <div className="intro">
       <div>
@@ -38,21 +37,20 @@ const Intro = () => {
             aria-label="Your Name"
             autoComplete="given-name"
           />
-          <input
-            type="hidden"
-            name="_action"
-            value="newUser"
-            required
-          />
-          <button type="submit" className="btn btn--dark" disabled={isSubmitting}>
-          {isSubmitting ? (
-            <span>Creating account...</span>
-          ) : (
-            <>
-            <span>Create Account</span>
-            <UserPlusIcon width={20} />
-            </>
-          )}
+          <input type="hidden" name="_action" value="newUser" required />
+          <button
+            type="submit"
+            className="btn btn--dark"
+            disabled={isSubmitting}
+          >
+            {isSubmitting ? (
+              <span>Creating account...</span>
+            ) : (
+              <>
+                <span>Create Account</span>
+                <UserPlusIcon width={20} />
+              </>
+            )}
           </button>
         </fetcher.Form>
       </div>

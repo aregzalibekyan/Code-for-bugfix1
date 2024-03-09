@@ -11,17 +11,14 @@ import {
   check,
   updateBudget,
 } from "../helpers";
-
 //components
 import Intro from "../components/Intro";
 import AddBudgetForm from "../components/AddBudgetForm";
 import AddExpenseForm from "../components/AddExpenseForm";
 import BudgetItem from "../components/BudgetItem";
 import Table from "../components/Table";
-
 //library imports
 import { toast } from "react-toastify";
-
 //loader
 export function dashboardLoader() {
   const userName = fetchData("userName");
@@ -29,14 +26,11 @@ export function dashboardLoader() {
   const expenses = fetchData("expenses");
   return { userName, budgets, expenses };
 }
-
 //action
 export async function dashboardAction({ request }) {
   await wait();
-
   const data = await request.formData();
   const { _action, ...values } = Object.fromEntries(data);
-
   //new user submission
   if (_action === "newUser") {
     try {
@@ -58,35 +52,38 @@ export async function dashboardAction({ request }) {
 
   if (_action === "createBudget") {
     try {
-      toast.warning('Please wait some time...')
+      toast.warning("Please wait some time...");
       await createBudget({
         name: values.newBudget,
         amount: values.newBudgetAmount,
       });
       return null;
     } catch (e) {
-      console.error(e)
+      console.error(e);
       throw new Error("There was a problem creating your budget.");
     }
   }
 
   if (_action === "createExpense") {
     try {
-          const checked = check({
-            expense:values.newExpense.trim(),
-            amount: values.newExpenseAmount.trim(),
-            budgetId: values.newExpenseBudget,
-          },true);
-          if (!checked) {
-            createExpense({
-              name: values.newExpense.trim(),
-              amount: parseFloat(values.newExpenseAmount),
-              budgetId: values.newExpenseBudget,
-            });
-            // change the Value
-            return null;
-          }
-          return null;
+      const checked = check(
+        {
+          expense: values.newExpense.trim(),
+          amount: values.newExpenseAmount.trim(),
+          budgetId: values.newExpenseBudget,
+        },
+        true
+      );
+      if (!checked) {
+        createExpense({
+          name: values.newExpense.trim(),
+          amount: parseFloat(values.newExpenseAmount),
+          budgetId: values.newExpenseBudget,
+        });
+        // change the Value
+        return null;
+      }
+      return null;
     } catch (e) {
       console.error(e);
       throw new Error("There was a problem creating your expense.");
@@ -136,11 +133,14 @@ const Dashboard = () => {
                 <div className="flex-lg">
                   <AddBudgetForm />
                   <AddExpenseForm budgets={budgets} />
-                  <button 
-                  className="btn btn--dark ifrm--but"
-                  onClick={() => {
-                        bottomRef.current.scrollIntoView({ behavior: "smooth" });
-                  }}>Currency converter</button>
+                  <button
+                    className="btn btn--dark ifrm--but"
+                    onClick={() => {
+                      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+                    }}
+                  >
+                    Currency converter
+                  </button>
                 </div>
                 <h2>Existing Budgets</h2>
 
@@ -163,11 +163,8 @@ const Dashboard = () => {
                       </Link>
                     )}
                   </div>
-                  
                 )}
-                
               </div>
-              
             ) : (
               <div className="grid-sm">
                 <p>Personal Budgeting is the secret to financial freedom.</p>
@@ -175,13 +172,12 @@ const Dashboard = () => {
                 <AddBudgetForm />
               </div>
             )}
-            <div ref={bottomRef} className="div--iframe" >
-                  <iframe
-                    src="https://www.xe.com/currencyconverter/"
-                    className="iframe"
-                    
-                  ></iframe>
-                </div>
+            <div ref={bottomRef} className="div--iframe">
+              <iframe
+                src="https://www.xe.com/currencyconverter/"
+                className="iframe"
+              ></iframe>
+            </div>
           </div>
         </div>
       ) : (

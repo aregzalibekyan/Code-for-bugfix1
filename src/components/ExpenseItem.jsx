@@ -1,6 +1,6 @@
 //rrd import
 import { Link, useFetcher } from "react-router-dom";
-import { useEffect, useRef,useState } from "react";
+import { useEffect, useRef, useState } from "react";
 // helpers
 import {
   // formatCurrency,
@@ -42,7 +42,9 @@ const ExpenseItem = ({ expense, showBudget }) => {
   return (
     <>
       <td>{expense.name}</td>
-      <td>{expense.amount} {expense.currency}</td>
+      <td>
+        {expense.amount} {expense.currency}
+      </td>
       <td>{formatDateToLocaleString(expense.createdAt)}</td>
       {showBudget && (
         <td>
@@ -85,9 +87,7 @@ const ExpenseItem = ({ expense, showBudget }) => {
               aria-label={`Update ${expense.name} expense`}
               disabled={isSubmitting}
             >
-              
-                <CloudIcon width={20} />
-              
+              <CloudIcon width={20} />
             </Link>
           </fetcher.Form>
         </div>

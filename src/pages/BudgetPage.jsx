@@ -10,17 +10,14 @@ import {
   updateBudget,
   updateExpense,
 } from "../helpers";
-
 //components
 import BudgetItem from "../components/BudgetItem";
 import AddExpenseForm from "../components/AddExpenseForm";
 import AddExpenseUpdateForm from "../components/AddExpenseUpdateForm";
 import Table from "../components/Table";
-
 //library
 import { toast } from "react-toastify";
 import AddUpdateForm from "../components/AddUpdateForm";
-
 //loader
 export async function budgetLoader({ params }) {
   const budget = await getAllMatchingItems({
@@ -40,35 +37,32 @@ export async function budgetLoader({ params }) {
   }
   return { budget, expenses };
 }
-
 //action
-
 export async function budgetAction({ request }) {
   const data = await request.formData();
   const { _action, ...values } = Object.fromEntries(data);
 
   if (_action === "createExpense") {
     try {
-     
-        const checked = check({
-          expense:values.newExpense.trim(),
+      const checked = check(
+        {
+          expense: values.newExpense.trim(),
           amount: values.newExpenseAmount.trim(),
           budgetId: values.newExpenseBudget,
-        },true);
-        if (!checked) {
-          createExpense({
-            name: values.newExpense.trim(),
-            amount: parseFloat(values.newExpenseAmount),
-            budgetId: values.newExpenseBudget,
-          });
-          // change the Value
-          return null;
-        }
+        },
+        true
+      );
+      if (!checked) {
+        createExpense({
+          name: values.newExpense.trim(),
+          amount: parseFloat(values.newExpenseAmount),
+          budgetId: values.newExpenseBudget,
+        });
+        // change the Value
         return null;
-      
-    
-
-  } catch (e) {
+      }
+      return null;
+    } catch (e) {
       throw new Error("There was a problem creating your expense.");
     }
   }
@@ -86,26 +80,24 @@ export async function budgetAction({ request }) {
   }
   if (_action === "updateBudget") {
     try {
-        updateBudget({
-          name: values.newBudgetName,
-          amount: values.newBudgetAmount,
-          budgetId: values.newExpenseBudget,
-        });
-        return null;
-      
+      updateBudget({
+        name: values.newBudgetName,
+        amount: values.newBudgetAmount,
+        budgetId: values.newExpenseBudget,
+      });
+      return null;
     } catch (e) {
       throw new Error("Oh no! Something is wrong!");
     }
   }
   if (_action === "updateExpense") {
     try {
-        updateExpense({
-          name: values.newExpense,
-          amount: parseFloat(values.newExpenseAmount),
-          expenseId: values.newExpenseId,
-        });
-        return null;
-    
+      updateExpense({
+        name: values.newExpense,
+        amount: parseFloat(values.newExpenseAmount),
+        expenseId: values.newExpenseId,
+      });
+      return null;
     } catch (e) {
       throw new Error("Oh no! Something is wrong!");
     }
@@ -131,7 +123,7 @@ const BudgetPage = () => {
         <AddUpdateForm budgets={[budget]} />
         {expenses.length > 0 && <AddExpenseUpdateForm expenses={expenses} />}
         <button
-        className="btn btn--dark ifrm--but"
+          className="btn btn--dark ifrm--but"
           onClick={() => {
             bottomRef.current.scrollIntoView({ behavior: "smooth" });
           }}
